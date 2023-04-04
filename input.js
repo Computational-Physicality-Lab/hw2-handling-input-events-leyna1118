@@ -8,8 +8,6 @@ of the interaction.
 */
 
 let lastClick = null;
-let curTouch = null;
-let workspaceTouchstarted = false;
 let wasDragging = false;
 let dragging = false;
 let curDrag = null;
@@ -93,6 +91,11 @@ const targets = document.querySelectorAll('.target');
 
 
 // touch
+let curTouch = null;
+let workspaceTouchstarted = false;
+let touchCount = 0;
+let dblTouched = false;
+
 workspace.addEventListener('touchstart', function(e){
     console.log('workspace touchstart');
     e.preventDefault();
@@ -105,14 +108,11 @@ for(let i = 0; i < targets.length; i++){
         console.log('target touchstart');
         e.preventDefault();
         curTouch = this;
-
         touchIdentifier = e.targetTouches[0].identifier;
         dragging = true;
         curDrag = this;
-        lastState.l = this.offsetLeft;
-        lastState.t = this.offsetTop;
-        // lastState.l = parseInt(this.style.left) || 0;
-        // lastState.t = parseInt(this.style.top) || 0;
+        lastState.l = parseInt(this.style.left) || 0;
+        lastState.t = parseInt(this.style.top) || 0;
         e.stopPropagation();
     });
 
@@ -127,7 +127,7 @@ document.addEventListener('touchmove', function(e){
             break;
         }
     }
-    if (touch && dragging) {
+    if ((touch || dblTouched) && dragging) {
         console.log('touchmove');
         curDrag.style.left = touch.pageX - curDrag.offsetWidth / 2 + 'px';
         curDrag.style.top = touch.pageY - curDrag.offsetHeight / 2 + 'px';
@@ -141,8 +141,28 @@ document.addEventListener('touchend', function(e){
         if(lastClick != null)
             lastClick.style.backgroundColor = '#f00';
         workspaceTouchstarted = false;
+        touchIdentifier = null;
+        dragging = false;
+        curDrag = null;
+        dblTouched = false;
         return;
     }
+
+    ++touchCount;
+    if (touchCount === 2) {
+        dblTouched = true;
+        touchCount = 0;
+        console.log("QQ");
+        
+        return;
+    }
+
+
+    setTimeout(function() {
+        if (touchCount === 1) {
+            touchCount = 0;
+        }
+    }, 300);
 
     if (e.changedTouches[0].identifier === touchIdentifier) {
         console.log('target touchend');
