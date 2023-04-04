@@ -7,47 +7,69 @@ You will certainly need a large number of global variables to keep track of the 
 of the interaction.
 */
 
-let lastBlue = null;
+let lastClick = null;
+let wasDragging = false;
 
 const workspace = document.querySelector('#workspace');
 workspace.addEventListener('click', function(e){
-    console.log("unblue");
-    if(lastBlue != null)
-    lastBlue.style.backgroundColor = '#f00';
+    console.log("workspace click");
+    if(lastClick != null)
+        lastClick.style.backgroundColor = '#f00';
+});
+
+document.addEventListener('keydown', function(e){
+    if(e.key === "Escape"){
+        console.log("esc");
+    }
 });
 
 const targets = document.querySelectorAll('.target');
 for(let i = 0; i < targets.length; i++){
     // blue
     targets[i].addEventListener('click', function(e){
-        console.log("blue");
-        if(lastBlue != null)
-            lastBlue.style.backgroundColor = '#f00';
+        console.log("target click");
+        if(wasDragging == true){
+            wasDragging = false;
+            e.stopPropagation();
+            return;
+        }
+        if(lastClick != null)
+            lastClick.style.backgroundColor = '#f00';
         this.style.backgroundColor = '#00f';
-        lastBlue = this;
+        lastClick = this;
         e.stopPropagation();
     });
     
     // drag
     let dragging = false;
-    let lastDrag = null;
+    let curDrag = null;
     targets[i].addEventListener('mousedown', function(e){
+        console.log("mousedown");
         dragging = true;
-        lastDrag = this;
+        curDrag = this;
         e.stopPropagation();
     });
 
     document.addEventListener('mousemove', function(e){
         if(dragging){
-            lastDrag.style.left = e.pageX - lastDrag.offsetWidth / 2 + 'px';
-            lastDrag.style.top = e.pageY - lastDrag.offsetHeight / 2 + 'px';
+            console.log("mousemove");
+            curDrag.style.left = e.pageX - curDrag.offsetWidth / 2 + 'px';
+            curDrag.style.top = e.pageY - curDrag.offsetHeight / 2 + 'px';
+            wasDragging = true;
         }
     });
 
     document.addEventListener('mouseup', function(e){
+        console.log("mouseup");
         dragging = false;
-        lastDrag = null;
+        curDrag = null;
     });
 
-    
+    //double
+    targets[i].addEventListener('dblclick', function(e){
+        console.log("dbclick");
+        dragging = true;
+        curDrag = this;
+        e.stopPropagation();
+    });
 }
