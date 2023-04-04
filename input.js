@@ -109,8 +109,10 @@ for(let i = 0; i < targets.length; i++){
         touchIdentifier = e.targetTouches[0].identifier;
         dragging = true;
         curDrag = this;
-        lastState.l = parseInt(this.style.left) || 0;;
-        lastState.t = parseInt(this.style.top) || 0;;
+        lastState.l = this.offsetLeft;
+        lastState.t = this.offsetTop;
+        // lastState.l = parseInt(this.style.left) || 0;
+        // lastState.t = parseInt(this.style.top) || 0;
         e.stopPropagation();
     });
 
@@ -153,7 +155,7 @@ document.addEventListener('touchend', function(e){
         if(lastClick != null)
             lastClick.style.backgroundColor = '#f00';
         curTouch.style.backgroundColor = '#00f';
-        wasDragging = false;
         lastClick = curTouch;
     }
+    wasDragging = false;
 });
